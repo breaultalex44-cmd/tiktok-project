@@ -3,42 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FloatDeck - TikTok Player for Google</title>
+    <title>TikTok Search & Video Player</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts Inter & Outfit -->
+    <!-- Google Font Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#080C12',
-                            card: '#121924',
-                            surface: '#1A2332',
-                            teal: '#00E5FF',
-                            tealDark: '#00B4D8',
-                            purple: '#7C3AED',
-                            accent: '#38BDF8'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Outfit', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Optimizations for 60Hz Mobile Hardware Acceleration */
         * {
             -webkit-tap-highlight-color: transparent;
             user-select: none;
@@ -46,8 +21,8 @@
         }
 
         body {
-            background-color: #080C12;
-            color: #F3F4F6;
+            background-color: #0f0f11;
+            color: #ffffff;
             font-family: 'Inter', sans-serif;
             overflow: hidden;
             height: 100vh;
@@ -55,37 +30,14 @@
             width: 100vw;
         }
 
-        /* Glassmorphism Panels styled after modern FOSS F-Droid / FloatDeck apps */
-        .glass-panel {
-            background: rgba(18, 25, 36, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .glass-card {
-            background: linear-gradient(145deg, rgba(26, 35, 50, 0.8), rgba(18, 25, 36, 0.9));
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .glass-card:active {
-            transform: scale(0.985);
-            transition: transform 0.1s ease;
-        }
-
-        /* Touch Target Pad Standards (Min 48px) */
         .touch-pad {
-            min-width: 48px;
-            min-height: 48px;
+            min-width: 44px;
+            min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Custom Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -94,575 +46,362 @@
             scrollbar-width: none;
         }
 
-        /* Active Navigation Glow */
-        .nav-glow {
-            position: relative;
-        }
-        .nav-glow.active::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 16px;
-            height: 3px;
-            background: #00E5FF;
-            border-radius: 999px;
-            box-shadow: 0 0 10px #00E5FF;
-        }
-
-        /* Smooth CSS Hardware Accelerated Slide Transitions */
-        .view-screen {
+        .page-screen {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
-            will-change: transform, opacity;
+            display: none;
         }
 
-        .view-hidden-right {
-            transform: translateX(100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .view-hidden-left {
-            transform: translateX(-100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .view-active {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Pulse Animations */
-        @keyframes subtle-glow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-        .glow-effect {
-            animation: subtle-glow 4s infinite ease-in-out;
+        .page-screen.active {
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
-<body class="bg-brand-dark text-gray-100 flex flex-col h-full w-full select-none">
+<body class="bg-black text-gray-100 flex flex-col h-full w-full">
 
-    <!-- Background Accent Atmosphere -->
-    <div class="fixed -top-24 -left-24 w-72 h-72 bg-brand-teal/15 rounded-full blur-3xl pointer-events-none glow-effect"></div>
-    <div class="fixed top-1/2 -right-24 w-80 h-80 bg-brand-purple/15 rounded-full blur-3xl pointer-events-none glow-effect" style="animation-delay: 2s;"></div>
-
-    <!-- MAIN APP WRAPPER (Tuned to 20:9 ratio viewport bounds) -->
-    <div class="relative flex-1 w-full max-w-md mx-auto h-full flex flex-col overflow-hidden bg-brand-dark/50 sm:border-x sm:border-gray-800">
+    <!-- MAIN APP WRAPPER -->
+    <div class="relative flex-1 w-full max-w-md mx-auto h-full flex flex-col overflow-hidden bg-gray-950 sm:border-x sm:border-gray-800">
         
-        <!-- HEADER / NAVIGATION (FloatDeck Style translucent header) -->
-        <header class="z-30 pt-3 pb-2 px-4 glass-panel sticky top-0 flex items-center justify-between border-b border-white/5">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-teal to-brand-purple flex items-center justify-center shadow-lg shadow-brand-teal/20">
-                    <i data-lucide="layers" class="w-5 h-5 text-black stroke-[2.5]"></i>
+        <!-- HEADER -->
+        <header class="z-30 pt-3 pb-3 px-4 bg-gray-900 sticky top-0 flex items-center justify-between border-b border-gray-800">
+            <div class="flex items-center space-x-2" onclick="switchPage('page-search')">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-400 to-pink-500 flex items-center justify-center font-bold text-black text-sm">
+                    TK
                 </div>
                 <div>
-                    <h1 class="font-display font-bold text-base tracking-wide text-white leading-none">FloatDeck</h1>
-                    <span class="text-[10px] text-brand-teal font-medium tracking-wider uppercase">TikTok Google Engine</span>
+                    <h1 class="font-bold text-sm leading-none">TikTok Search Engine</h1>
+                    <span class="text-[10px] text-cyan-400 font-medium">Motorola Edition</span>
                 </div>
             </div>
 
-            <!-- Quick Action Icons -->
-            <div class="flex items-center space-x-1">
-                <button id="btn-toggle-engine" onclick="toggleEngineMode()" class="touch-pad rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-xs font-semibold text-brand-teal px-3 py-1 flex items-center gap-1.5 transition">
-                    <i data-lucide="globe" class="w-4 h-4"></i>
-                    <span id="engine-mode-label">Google Frame</span>
-                </button>
-                <button onclick="openModal('settings-modal')" class="touch-pad rounded-xl text-gray-400 hover:text-white transition">
-                    <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+            <div class="flex items-center space-x-2">
+                <button id="mode-toggle-btn" onclick="toggleEngineMode()" class="touch-pad px-3 py-1 bg-gray-800 hover:bg-gray-700 text-xs font-medium text-cyan-400 rounded-lg border border-gray-700">
+                    <span id="mode-label">Native Player</span>
                 </button>
             </div>
         </header>
 
-        <!-- VIEW CONTAINER -->
-        <main class="relative flex-1 w-full h-full overflow-hidden">
+        <!-- CONTENT AREA -->
+        <main class="relative flex-1 w-full h-full overflow-hidden bg-black">
             
-            <!-- SCREEN 1: DISCOVERY DASHBOARD -->
-            <section id="view-dashboard" class="view-screen view-active flex flex-col h-full overflow-y-auto no-scrollbar pb-24">
+            <!-- PAGE 1: SEARCH & DISCOVERY -->
+            <section id="page-search" class="page-screen active overflow-y-auto no-scrollbar pb-20 p-4 space-y-4">
                 
-                <!-- Advanced Search Section -->
-                <div class="p-4 space-y-3">
+                <!-- Search Box -->
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Google TikTok Search</label>
                     <div class="relative flex items-center">
-                        <i data-lucide="search" class="absolute left-3.5 w-5 h-5 text-gray-400"></i>
-                        <input type="text" id="dashboard-search-input" 
-                            placeholder="Search TikTok on Google..." 
-                            onkeydown="if(event.key==='Enter') triggerSearch()"
-                            class="w-full bg-brand-surface/90 text-sm text-white placeholder-gray-400 pl-11 pr-24 py-3.5 rounded-2xl border border-white/10 focus:outline-none focus:border-brand-teal/60 focus:ring-1 focus:ring-brand-teal/60 transition shadow-inner">
-                        
-                        <button onclick="triggerSearch()" class="absolute right-2 px-3.5 py-2 bg-gradient-to-r from-brand-teal to-brand-tealDark text-black text-xs font-bold rounded-xl shadow-md active:scale-95 transition">
+                        <i data-lucide="search" class="absolute left-3.5 w-4 h-4 text-gray-400"></i>
+                        <input type="text" id="search-input" 
+                            placeholder="Search videos (e.g. gta edits, hockey)..." 
+                            onkeydown="if(event.key==='Enter') executeSearch()"
+                            class="w-full bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-20 py-3 rounded-xl border border-gray-800 focus:outline-none focus:border-cyan-500">
+                        <button onclick="executeSearch()" class="absolute right-1.5 px-3 py-1.5 bg-cyan-500 text-black text-xs font-bold rounded-lg active:scale-95 transition">
                             Search
                         </button>
                     </div>
+                </div>
 
-                    <!-- Category Chips -->
-                    <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
-                        <button onclick="quickSearch('Trending')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-brand-teal/20 text-brand-teal border border-brand-teal/30 whitespace-nowrap active:scale-95">🔥 Trending</button>
-                        <button onclick="quickSearch('Skateboarding tricks')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap active:scale-95">🛹 Skateboarding</button>
-                        <button onclick="quickSearch('Gaming highlights')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap active:scale-95">🎮 Gaming</button>
-                        <button onclick="quickSearch('Calisthenics workout')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap active:scale-95">💪 Fitness</button>
-                        <button onclick="quickSearch('Funny cat videos')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap active:scale-95">🐱 Comedy</button>
-                        <button onclick="quickSearch('Tech reviews')" class="chip px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap active:scale-95">📱 Tech</button>
-                    </div>
-
-                    <!-- Search Filters -->
-                    <div class="flex items-center justify-between px-1 text-xs text-gray-400">
-                        <span class="flex items-center gap-1.5">
-                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-teal"></i> Google Anti-Redirect Sandboxed
-                        </span>
-                        <div class="flex items-center gap-3">
-                            <label class="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" id="filter-exact" class="accent-brand-teal rounded"> Exact Match
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" id="filter-safe" checked class="accent-brand-teal rounded"> SafeSearch
-                            </label>
-                        </div>
+                <!-- Quick Categories -->
+                <div class="space-y-2">
+                    <span class="text-xs text-gray-400">Popular Queries:</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="quickSearch('gta v edits')" class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-xs text-cyan-400 rounded-lg border border-gray-800">🚗 GTA V Edits</button>
+                        <button onclick="quickSearch('calisthenics workout')" class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-xs text-gray-300 rounded-lg border border-gray-800">💪 Calisthenics</button>
+                        <button onclick="quickSearch('montreal canadiens')" class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-xs text-gray-300 rounded-lg border border-gray-800">🏒 Canadiens</button>
+                        <button onclick="quickSearch('trailer park boys')" class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-xs text-gray-300 rounded-lg border border-gray-800">📺 TPB Edits</button>
+                        <button onclick="quickSearch('skateboarding tricks')" class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-xs text-gray-300 rounded-lg border border-gray-800">🛹 Skateboarding</button>
                     </div>
                 </div>
 
-                <!-- Featured Deck Feed (FloatDeck Cards) -->
-                <div class="px-4 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display font-semibold text-sm text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                            <i data-lucide="sparkles" class="w-4 h-4 text-brand-teal"></i> Featured Decks
-                        </h2>
-                        <span id="deck-count" class="text-xs text-gray-500 font-mono">5 Channels</span>
-                    </div>
-
-                    <!-- Dynamic Card Deck -->
-                    <div id="deck-container" class="space-y-3.5">
-                        <!-- Deck Card items injected by JS -->
+                <!-- Featured Video List -->
+                <div class="space-y-2 pt-2">
+                    <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Curated Video Feed</h2>
+                    <div id="video-feed-list" class="space-y-2.5">
+                        <!-- Items rendered via JS -->
                     </div>
                 </div>
             </section>
 
-            <!-- SCREEN 2: IN-PAGE GOOGLE SEARCH & EMBED PLAYER -->
-            <section id="view-player" class="view-screen view-hidden-right flex flex-col h-full bg-black">
+            <!-- PAGE 2: VIDEO PLAYER -->
+            <section id="page-player" class="page-screen bg-black">
                 
-                <!-- In-App Google TikTok Frame Container -->
-                <div class="relative flex-1 w-full h-full overflow-hidden bg-gray-950 flex flex-col">
+                <div class="relative flex-1 w-full h-full flex flex-col justify-between overflow-hidden">
                     
-                    <!-- Top Controls Bar -->
-                    <div class="z-20 bg-brand-card/95 backdrop-blur-md px-3 py-2 flex items-center justify-between border-b border-white/10">
-                        <button onclick="switchView('view-dashboard')" class="touch-pad rounded-xl bg-white/10 text-gray-200 active:scale-95 transition">
-                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                        </button>
-                        
-                        <div class="flex-1 mx-3 overflow-hidden text-center">
-                            <p id="player-title" class="text-xs font-medium text-gray-200 truncate">Google TikTok Embed Engine</p>
-                            <p id="player-subtitle" class="text-[10px] text-brand-teal truncate font-mono">google.com/search?q=site:tiktok.com</p>
+                    <!-- Native HTML5 Video Deck -->
+                    <div id="native-player-box" class="relative flex-1 w-full h-full bg-black flex items-center justify-center">
+                        <video id="main-video" 
+                            class="w-full h-full object-cover" 
+                            playsinline 
+                            webkit-playsinline 
+                            onclick="togglePlayPause()">
+                            <source id="video-src" src="" type="video/mp4">
+                        </video>
+
+                        <!-- Progress Scrub Line -->
+                        <div class="absolute top-0 inset-x-0 h-1 bg-gray-800 z-20">
+                            <div id="video-progress" class="h-full bg-cyan-400 w-0"></div>
                         </div>
 
-                        <div class="flex items-center gap-1">
-                            <button onclick="reloadEngine()" class="touch-pad rounded-xl text-gray-300 hover:text-white transition">
-                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        <!-- Right Control Panel -->
+                        <div class="absolute right-3 bottom-16 flex flex-col items-center space-y-4 z-20">
+                            <button onclick="toggleLike(this)" class="touch-pad flex flex-col items-center text-white">
+                                <div class="w-10 h-10 rounded-full bg-gray-900/80 border border-gray-700 flex items-center justify-center">
+                                    <i data-lucide="heart" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[10px] mt-1 font-semibold">Like</span>
                             </button>
-                            <button onclick="toggleFallbackPlayer()" class="touch-pad rounded-xl text-brand-teal hover:text-white transition" title="Switch to HTML5 Video Player">
-                                <i data-lucide="smartphone" class="w-4 h-4"></i>
+
+                            <button onclick="playNextVideo()" class="touch-pad flex flex-col items-center text-white">
+                                <div class="w-10 h-10 rounded-full bg-gray-900/80 border border-gray-700 flex items-center justify-center text-cyan-400">
+                                    <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-[10px] mt-1 font-semibold">Next</span>
                             </button>
+                        </div>
+
+                        <!-- Bottom Info Overlay -->
+                        <div class="absolute left-3 bottom-6 right-16 z-20 space-y-1 text-left">
+                            <h3 id="player-author" class="font-bold text-sm text-white">@tiktok_creator</h3>
+                            <p id="player-desc" class="text-xs text-gray-300 line-clamp-2">TikTok clip loaded successfully.</p>
+                            <p class="text-[10px] text-cyan-400 font-mono">Autoplay Next: ON</p>
                         </div>
                     </div>
 
-                    <!-- Mode A: Sandboxed Google Search Frame (Stays strictly inside app) -->
-                    <div id="google-iframe-wrapper" class="relative flex-1 w-full h-full">
+                    <!-- In-App Google Search Web Feed -->
+                    <div id="google-iframe-box" class="relative flex-1 w-full h-full hidden bg-gray-950">
                         <iframe id="google-frame" 
                             src="about:blank" 
-                            class="w-full h-full border-0"
-                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups-to-escape-sandbox"
-                            referrerpolicy="no-referrer">
+                            class="w-full h-full border-0 bg-gray-950"
+                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
                         </iframe>
-                        <!-- Security & Sandbox Protection Banner -->
-                        <div id="sandbox-shield" class="absolute bottom-2 left-2 right-2 bg-brand-surface/90 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 flex items-center justify-between text-xs text-gray-300 shadow-xl pointer-events-none">
-                            <span class="flex items-center gap-1.5 font-medium text-[11px]">
-                                <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-teal"></i> Redirect Blocker Active
-                            </span>
-                            <span class="text-[10px] text-gray-400">Guaranteed In-App Stay</span>
-                        </div>
                     </div>
 
-                    <!-- Mode B: HTML5 Vertical Swipe Video Feed (Fallback Player) -->
-                    <div id="fallback-player-wrapper" class="relative flex-1 w-full h-full hidden bg-black">
-                        
-                        <div id="swipe-video-card" class="relative w-full h-full flex items-center justify-center">
-                            <!-- HTML5 Video Element -->
-                            <video id="native-video" 
-                                class="w-full h-full object-cover" 
-                                loop 
-                                playsinline 
-                                webkit-playsinline
-                                onclick="toggleVideoPlay()">
-                                <source id="video-source" src="" type="video/mp4">
-                            </video>
-
-                            <!-- Gradient Overlays for Readability -->
-                            <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
-                            <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
-
-                            <!-- Play/Pause Indicator Center Overlay -->
-                            <div id="play-pause-icon" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity pointer-events-none">
-                                <div class="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
-                                    <i data-lucide="play" class="w-8 h-8 fill-white"></i>
-                                </div>
-                            </div>
-
-                            <!-- Right Vertical Action Bar -->
-                            <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-4 z-10">
-                                <!-- Profile Avatar -->
-                                <div class="relative mb-2">
-                                    <img id="creator-avatar" src="https://placehold.co/100x100/1e293b/00E5FF?text=TK" class="w-11 h-11 rounded-full border-2 border-brand-teal shadow-lg object-cover">
-                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-brand-teal text-black rounded-full p-0.5">
-                                        <i data-lucide="plus" class="w-3 h-3 stroke-[3]"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Like Button -->
-                                <button onclick="toggleLike(this)" class="touch-pad flex flex-col items-center text-white active:scale-125 transition">
-                                    <div class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                                        <i data-lucide="heart" class="w-6 h-6 icon-heart"></i>
-                                    </div>
-                                    <span id="like-count" class="text-[11px] font-semibold mt-1">14.2K</span>
-                                </button>
-
-                                <!-- Comment Button -->
-                                <button onclick="openModal('comment-modal')" class="touch-pad flex flex-col items-center text-white active:scale-125 transition">
-                                    <div class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                                        <i data-lucide="message-circle" class="w-6 h-6"></i>
-                                    </div>
-                                    <span class="text-[11px] font-semibold mt-1">428</span>
-                                </button>
-
-                                <!-- Bookmark Button -->
-                                <button onclick="toggleBookmark(this)" class="touch-pad flex flex-col items-center text-white active:scale-125 transition">
-                                    <div class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                                        <i data-lucide="bookmark" class="w-6 h-6 icon-bookmark"></i>
-                                    </div>
-                                    <span class="text-[11px] font-semibold mt-1">Save</span>
-                                </button>
-
-                                <!-- Share Button -->
-                                <button onclick="openModal('share-modal')" class="touch-pad flex flex-col items-center text-white active:scale-125 transition">
-                                    <div class="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center">
-                                        <i data-lucide="share-2" class="w-6 h-6"></i>
-                                    </div>
-                                    <span class="text-[11px] font-semibold mt-1">Share</span>
-                                </button>
-                            </div>
-
-                            <!-- Bottom Info Description Section -->
-                            <div class="absolute left-3 bottom-6 right-16 z-10 text-left space-y-2">
-                                <h3 id="video-author" class="font-bold text-sm text-white flex items-center gap-1.5">
-                                    @tiktok_creator <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-brand-teal fill-brand-teal/20"></i>
-                                </h3>
-                                <p id="video-desc" class="text-xs text-gray-200 line-clamp-2 leading-relaxed font-normal">
-                                    Amazing viral clip loaded straight from Google search index! #viral #trending #floatdeck
-                                </p>
-                                <div class="flex items-center gap-2 text-xs text-gray-300">
-                                    <i data-lucide="music" class="w-3.5 h-3.5 text-brand-teal animate-spin" style="animation-duration: 4s;"></i>
-                                    <span id="video-audio" class="truncate text-[11px] opacity-90">Original Sound - TikTok Audio Track</span>
-                                </div>
-                            </div>
-
-                            <!-- Swipe Hint Overlay -->
-                            <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] text-gray-300 pointer-events-none flex items-center gap-1 border border-white/10">
-                                <i data-lucide="arrow-up-down" class="w-3 h-3 text-brand-teal"></i> Swipe Up / Down for next video
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- SCREEN 3: SAVED FAVORITES DECK -->
-            <section id="view-saved" class="view-screen view-hidden-right flex flex-col h-full overflow-y-auto no-scrollbar p-4 pb-24">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
-                        <i data-lucide="bookmark" class="w-5 h-5 text-brand-teal"></i> Saved Deck
-                    </h2>
-                    <span id="saved-count-badge" class="text-xs bg-brand-teal/20 text-brand-teal font-mono px-2.5 py-0.5 rounded-full border border-brand-teal/30">0 Items</span>
-                </div>
-
-                <div id="saved-deck-list" class="space-y-3">
-                    <!-- Dynamic Saved Cards -->
-                    <div class="glass-card p-6 rounded-2xl text-center space-y-2">
-                        <i data-lucide="folder-heart" class="w-10 h-10 text-gray-500 mx-auto"></i>
-                        <p class="text-sm text-gray-300 font-medium">Your Deck is Empty</p>
-                        <p class="text-xs text-gray-500">Bookmark TikToks or searches to keep them on your FloatDeck.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SCREEN 4: HISTORY -->
-            <section id="view-history" class="view-screen view-hidden-right flex flex-col h-full overflow-y-auto no-scrollbar p-4 pb-24">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
-                        <i data-lucide="history" class="w-5 h-5 text-brand-purple"></i> Search History
-                    </h2>
-                    <button onclick="clearHistory()" class="text-xs text-red-400 hover:text-red-300 font-medium">Clear All</button>
-                </div>
-
-                <div id="history-list" class="space-y-2.5">
-                    <!-- Dynamic History Items -->
                 </div>
             </section>
 
         </main>
 
-        <!-- FLOATING BOTTOM NAVIGATION BAR (FloatDeck FOSS Floating Style) -->
-        <nav class="absolute bottom-3 left-4 right-4 z-40 glass-panel rounded-2xl py-2 px-3 flex items-center justify-around border border-white/10 shadow-2xl">
-            <button onclick="switchView('view-dashboard')" id="nav-dash" class="nav-glow active touch-pad flex flex-col items-center text-brand-teal transition">
-                <i data-lucide="layout-grid" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Deck</span>
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="z-40 bg-gray-900 border-t border-gray-800 py-2 px-6 flex items-center justify-around text-xs">
+            <button onclick="switchPage('page-search')" id="nav-btn-search" class="flex flex-col items-center text-cyan-400 font-medium">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                <span class="mt-1 text-[10px]">Search</span>
             </button>
-            <button onclick="switchView('view-player')" id="nav-play" class="nav-glow touch-pad flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+            <button onclick="switchPage('page-player')" id="nav-btn-player" class="flex flex-col items-center text-gray-400 hover:text-white font-medium">
                 <i data-lucide="play-circle" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Player</span>
-            </button>
-            <button onclick="switchView('view-saved')" id="nav-save" class="nav-glow touch-pad flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i data-lucide="bookmark" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Saved</span>
-            </button>
-            <button onclick="switchView('view-history')" id="nav-hist" class="nav-glow touch-pad flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i data-lucide="history" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">History</span>
+                <span class="mt-1 text-[10px]">Player</span>
             </button>
         </nav>
 
-        <!-- MODAL 1: SETTINGS DIALOG -->
-        <div id="settings-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="glass-panel w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 border-t border-white/15 animate-in slide-in-from-bottom duration-200">
-                <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <h3 class="font-display font-bold text-base text-white flex items-center gap-2">
-                        <i data-lucide="settings" class="w-4 h-4 text-brand-teal"></i> Performance & FloatDeck Settings
-                    </h3>
-                    <button onclick="closeModal('settings-modal')" class="touch-pad rounded-xl text-gray-400 hover:text-white">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <div class="space-y-3.5 text-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-medium text-gray-200">Redirect Lock</p>
-                            <p class="text-xs text-gray-400">Forces video playback inside Google search iframe</p>
-                        </div>
-                        <input type="checkbox" checked disabled class="accent-brand-teal w-4 h-4">
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-medium text-gray-200">60Hz Moto G Tuning</p>
-                            <p class="text-xs text-gray-400">Hardware CSS transform & GPU acceleration</p>
-                        </div>
-                        <input type="checkbox" checked class="accent-brand-teal w-4 h-4">
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-medium text-gray-200">Autoplay Fallback Clips</p>
-                            <p class="text-xs text-gray-400">Automatically start next video on vertical swipe</p>
-                        </div>
-                        <input type="checkbox" id="setting-autoplay" checked class="accent-brand-teal w-4 h-4">
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button onclick="closeModal('settings-modal')" class="w-full py-3 bg-brand-surface hover:bg-white/10 text-white font-semibold text-xs rounded-xl border border-white/10">
-                        Save Preferences
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 2: SHARE MODAL -->
-        <div id="share-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-end justify-center">
-            <div class="glass-panel w-full max-w-md rounded-t-3xl p-5 space-y-4 border-t border-white/15">
-                <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <h3 class="font-display font-bold text-base text-white">Share TikTok Deck</h3>
-                    <button onclick="closeModal('share-modal')" class="touch-pad text-gray-400">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-4 gap-3 text-center py-2">
-                    <button onclick="copyShareLink()" class="flex flex-col items-center gap-1 text-xs text-gray-300">
-                        <div class="w-12 h-12 rounded-2xl bg-brand-teal/20 text-brand-teal flex items-center justify-center">
-                            <i data-lucide="copy" class="w-5 h-5"></i>
-                        </div>
-                        Copy Link
-                    </button>
-                    <button onclick="copyShareLink()" class="flex flex-col items-center gap-1 text-xs text-gray-300">
-                        <div class="w-12 h-12 rounded-2xl bg-brand-purple/20 text-brand-purple flex items-center justify-center">
-                            <i data-lucide="message-square" class="w-5 h-5"></i>
-                        </div>
-                        Message
-                    </button>
-                    <button onclick="copyShareLink()" class="flex flex-col items-center gap-1 text-xs text-gray-300">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                        </div>
-                        Send
-                    </button>
-                    <button onclick="copyShareLink()" class="flex flex-col items-center gap-1 text-xs text-gray-300">
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center">
-                            <i data-lucide="more-horizontal" class="w-5 h-5"></i>
-                        </div>
-                        More
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL 3: COMMENT OVERLAY -->
-        <div id="comment-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-end justify-center">
-            <div class="glass-panel w-full max-w-md h-[65vh] rounded-t-3xl p-4 flex flex-col border-t border-white/15">
-                <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <h3 class="font-display font-bold text-sm text-white">Comments (428)</h3>
-                    <button onclick="closeModal('comment-modal')" class="touch-pad text-gray-400">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <div class="flex-1 overflow-y-auto no-scrollbar py-3 space-y-3.5">
-                    <div class="flex gap-2.5">
-                        <img src="https://placehold.co/80x80/00E5FF/000000?text=U1" class="w-7 h-7 rounded-full">
-                        <div class="text-xs">
-                            <p class="font-semibold text-gray-300">alex_dev <span class="text-[10px] text-gray-500 font-normal">2h ago</span></p>
-                            <p class="text-gray-200 mt-0.5">This FloatDeck player works super smooth on my Moto G Play!</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2.5">
-                        <img src="https://placehold.co/80x80/7C3AED/ffffff?text=U2" class="w-7 h-7 rounded-full">
-                        <div class="text-xs">
-                            <p class="font-semibold text-gray-300">skate_fanatic <span class="text-[10px] text-gray-500 font-normal">5h ago</span></p>
-                            <p class="text-gray-200 mt-0.5">Love how Google embedded search doesn't open the TikTok app 💯</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-2 flex gap-2">
-                    <input type="text" placeholder="Add a comment..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-teal">
-                    <button class="px-3 py-2 bg-brand-teal text-black rounded-xl text-xs font-bold">Post</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TOAST NOTIFICATION CONTAINER -->
-        <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-brand-surface/95 text-white text-xs px-4 py-2.5 rounded-2xl border border-white/10 shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-4 h-4 text-brand-teal"></i>
-            <span id="toast-message">Action saved</span>
+        <!-- TOAST NOTIFICATION -->
+        <div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white text-xs px-4 py-2 rounded-xl border border-gray-700 opacity-0 pointer-events-none transition-opacity duration-200">
+            <span id="toast-text">Notification</span>
         </div>
 
     </div>
 
-    <!-- JAVASCRIPT APPLICATION ENGINE -->
     <script>
-        // Sample Curated TikTok Decks for Discovery Feed
-        const FEATURED_DECKS = [
+        const VIDEOS = [
             {
-                id: 'deck-1',
-                title: 'Skateboarding Tricks & Flip Highlights',
-                author: '@skate_world',
-                query: 'skateboarding tricks viral',
-                tag: 'Skateboarding',
-                likes: '84.5K',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                avatar: 'https://placehold.co/100x100/00E5FF/000000?text=SK'
+                title: 'GTA V Insane Stunt & Drift Edits',
+                author: '@gta_edits_daily',
+                query: 'gta v edits viral',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
             },
             {
-                id: 'deck-2',
-                title: 'Next Gen Tech Gadgets & Unboxing',
-                author: '@tech_future',
-                query: 'tech gadgets tiktok reviews',
-                tag: 'Tech',
-                likes: '120.1K',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-                avatar: 'https://placehold.co/100x100/7C3AED/FFFFFF?text=TC'
-            },
-            {
-                id: 'deck-3',
-                title: 'Insane Street Workout Calisthenics',
-                author: '@beast_calisthenics',
+                title: 'Street Calisthenics & Power Moves',
+                author: '@calisthenics_gods',
                 query: 'calisthenics street workout',
-                tag: 'Fitness',
-                likes: '56.9K',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-                avatar: 'https://placehold.co/100x100/38BDF8/000000?text=FIT'
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
             },
             {
-                id: 'deck-4',
-                title: 'Funniest Cat & Dog Moments Compilation',
-                author: '@pet_central',
-                query: 'funny cat clips viral',
-                tag: 'Comedy',
-                likes: '230K',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoylikes.mp4',
-                avatar: 'https://placehold.co/100x100/F59E0B/000000?text=PET'
+                title: 'Montreal Canadiens Goal Highlights',
+                author: '@habs_hockey',
+                query: 'montreal canadiens edits tiktok',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
             },
             {
-                id: 'deck-5',
-                title: 'Pro Gaming Clutch Plays & Edits',
-                author: '@esports_daily',
-                query: 'gaming clutch clips tiktok',
-                tag: 'Gaming',
-                likes: '91.3K',
-                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-                avatar: 'https://placehold.co/100x100/EC4899/FFFFFF?text=GM'
+                title: 'Trailer Park Boys Funniest Moments',
+                author: '@tpb_clips',
+                query: 'trailer park boys edits',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoylikes.mp4'
+            },
+            {
+                title: 'Pro Skateboarding Kickflips',
+                author: '@skate_vibes',
+                query: 'skateboarding tricks viral',
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'
             }
         ];
 
-        // State Management
-        let savedDecks = [];
-        let searchHistory = [];
-        let currentDeckIndex = 0;
-        let isEngineGoogleMode = true; // Google Iframe vs Native HTML5 Player
-        let isLiked = false;
-        let isBookmarked = false;
+        let currentIndex = 0;
+        let isNative = true;
 
-        // Initialize App on DOM Load
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            renderFeaturedDecks();
-            initTouchSwipePhysics();
-            loadLocalStorageData();
+            renderFeed();
+            setupVideoListeners();
         });
 
-        // Render Floating Card Decks into Dashboard
-        function renderFeaturedDecks() {
-            const container = document.getElementById('deck-container');
-            container.innerHTML = '';
+        function renderFeed() {
+            const list = document.getElementById('video-feed-list');
+            list.innerHTML = '';
 
-            FEATURED_DECKS.forEach((deck, idx) => {
-                const card = document.createElement('div');
-                card.className = 'glass-card p-4 rounded-2xl flex flex-col space-y-3 relative overflow-hidden group cursor-pointer';
-                card.onclick = () => openDeckInPlayer(deck);
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <img src="${deck.avatar}" class="w-9 h-9 rounded-full border border-brand-teal/40">
-                            <div>
-                                <h4 class="text-xs font-bold text-white leading-tight">${deck.author}</h4>
-                                <span class="text-[10px] text-brand-teal font-medium">${deck.tag}</span>
-                            </div>
-                        </div>
-                        <span class="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full text-gray-300 font-mono flex items-center gap-1">
-                            <i data-lucide="heart" class="w-3 h-3 text-red-400 fill-red-400"></i> ${deck.likes}
-                        </span>
-                    </div>
+            VIDEOS.forEach((item, i) => {
+                const el = document.createElement('div');
+                el.className = 'p-3 bg-gray-900 rounded-xl border border-gray-800 flex items-center justify-between cursor-pointer';
+                el.onclick = () => playVideoIndex(i);
+                el.innerHTML = `
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-100 group-hover:text-brand-teal transition">${deck.title}</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5 font-mono">google.com/search?q=site:tiktok.com+${encodeURIComponent(deck.query)}</p>
+                        <h4 class="text-xs font-bold text-white">${item.author}</h4>
+                        <p class="text-xs text-gray-300 mt-0.5">${item.title}</p>
                     </div>
-                    <div class="flex items-center justify-between pt-1 border-t border-white/5 text-xs text-gray-400">
-                        <span class="flex items-center gap-1 text-[11px]">
-                            <i data-lucide="play" class="w-3.5 h-3.5 text-brand-teal"></i> Launch Google Deck
-                        </span>
-                        <
+                    <button class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-semibold rounded-lg border border-cyan-500/30">
+                        Play
+                    </button>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        function setupVideoListeners() {
+            const video = document.getElementById('main-video');
+            const progress = document.getElementById('video-progress');
+
+            video.addEventListener('timeupdate', () => {
+                if (video.duration) {
+                    progress.style.width = ((video.currentTime / video.duration) * 100) + '%';
+                }
+            });
+
+            // AUTOPLAY NEXT VIDEO AUTOMATICALLY AFTER EDIT ENDS
+            video.addEventListener('ended', () => {
+                showToast('Autoplaying next video...');
+                playNextVideo();
+            });
+        }
+
+        function playVideoIndex(index) {
+            currentIndex = index;
+            const item = VIDEOS[currentIndex];
+
+            document.getElementById('player-author').innerText = item.author;
+            document.getElementById('player-desc').innerText = item.title;
+
+            const video = document.getElementById('main-video');
+            const source = document.getElementById('video-src');
+            source.src = item.url;
+            video.load();
+
+            switchPage('page-player');
+
+            if (isNative) {
+                video.play().catch(() => {});
+            }
+        }
+
+        function playNextVideo() {
+            currentIndex = (currentIndex + 1) % VIDEOS.length;
+            playVideoIndex(currentIndex);
+        }
+
+        function togglePlayPause() {
+            const video = document.getElementById('main-video');
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        function executeSearch() {
+            const input = document.getElementById('search-input');
+            const term = input.value.trim();
+            if (!term) return;
+
+            const googleUrl = `https://www.google.com/search?q=site:tiktok.com+${encodeURIComponent(term)}&igu=1`;
+            document.getElementById('google-frame').src = googleUrl;
+
+            // Switch to iframe Google mode
+            isNative = false;
+            document.getElementById('native-player-box').classList.add('hidden');
+            document.getElementById('google-iframe-box').classList.remove('hidden');
+            document.getElementById('mode-label').innerText = 'Google Feed';
+            
+            document.getElementById('main-video').pause();
+
+            switchPage('page-player');
+            showToast(`Loaded Google TikTok search for "${term}"`);
+        }
+
+        function quickSearch(term) {
+            document.getElementById('search-input').value = term;
+            executeSearch();
+        }
+
+        function toggleEngineMode() {
+            isNative = !isNative;
+            const nativeBox = document.getElementById('native-player-box');
+            const googleBox = document.getElementById('google-iframe-box');
+            const label = document.getElementById('mode-label');
+            const video = document.getElementById('main-video');
+
+            if (isNative) {
+                googleBox.classList.add('hidden');
+                nativeBox.classList.remove('hidden');
+                label.innerText = 'Native Player';
+                video.play().catch(() => {});
+                showToast('Switched to Native Player');
+            } else {
+                nativeBox.classList.add('hidden');
+                googleBox.classList.remove('hidden');
+                label.innerText = 'Google Feed';
+                video.pause();
+                
+                const frame = document.getElementById('google-frame');
+                if (frame.src === 'about:blank' || !frame.src) {
+                    const item = VIDEOS[currentIndex];
+                    frame.src = `https://www.google.com/search?q=site:tiktok.com+${encodeURIComponent(item.query)}&igu=1`;
+                }
+                showToast('Switched to Google Search Engine');
+            }
+        }
+
+        function switchPage(pageId) {
+            document.getElementById('page-search').classList.remove('active');
+            document.getElementById('page-player').classList.remove('active');
+            
+            document.getElementById(pageId).classList.add('active');
+
+            const searchBtn = document.getElementById('nav-btn-search');
+            const playerBtn = document.getElementById('nav-btn-player');
+
+            if (pageId === 'page-search') {
+                searchBtn.className = 'flex flex-col items-center text-cyan-400 font-medium';
+                playerBtn.className = 'flex flex-col items-center text-gray-400 hover:text-white font-medium';
+            } else {
+                playerBtn.className = 'flex flex-col items-center text-cyan-400 font-medium';
+                searchBtn.className = 'flex flex-col items-center text-gray-400 hover:text-white font-medium';
+            }
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('text-pink-500');
+            showToast(btn.classList.contains('text-pink-500') ? 'Liked' : 'Unliked');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 1800);
+        }
+    </script>
+</body>
+</html>
